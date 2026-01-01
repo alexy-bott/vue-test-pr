@@ -1,22 +1,9 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-
-const currentDate = ref('')
-
-onMounted(() => {
-  currentDate.value = new Date().toLocaleDateString('ru-RU', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-})
+import Button from "./components/Button.vue";
 </script>
 
 <template>
-  <div>
-    <p> Сегодня: {{ currentDate }}</p>
-  </div>
+  <Button>Начать игру</Button>
 </template>
 
 <style scoped>

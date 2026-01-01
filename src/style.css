@@ -1,0 +1,8 @@
+:root {
+    --color-primary: #FFFFFF;
+    --color-primary-inverted: #222222;
+    --color-bg: #F0F4F8;
+    --color-btn-primary: #008BFE;
+    --color-btn-hover: #006FCB;
+    --font: "Roboto", sans-serif;
+}
