@@ -11,8 +11,8 @@
 <style scoped>
 .button {
   border: none;
-  color: var(--color-primary);
-  background: var(--color-btn-primary);
+  color: var(--white);
+  background: var(--blue-600);
   border-radius: 100px;
   font-family: var(--font);
   font-weight: 400;
@@ -29,6 +29,6 @@
 }
 
 .button:hover {
-  background: var(--color-btn-hover);
+  background: var(--blue-700);
 }
 </style>
