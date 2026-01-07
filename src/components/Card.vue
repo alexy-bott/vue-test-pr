@@ -1,5 +1,4 @@
 <script setup>
-import {reactive} from 'vue';
 import CheckIcon from "./icons/CheckIcon.vue";
 import CrossIcon from "./icons/CrossIcon.vue";
 
@@ -15,31 +14,29 @@ const props = defineProps({
   cardTranslation: {
     type: String,
     default: "",
+  },
+  state: {
+    type: String,
+    default: "closed" // closed | opened
+  },
+  status: {
+    type: String,
+    default: "pending" // success | fail | pending
   }
 });
 
-const emit = defineEmits(['flip', 'action']);
+const emit = defineEmits(['open', 'action']);
 
-const card = reactive({
-  state: 'initial',  // 'initial' | 'flipped' | 'completed'
-  remembered: null   // null | true | false
-});
-
-const flipCard = () => {
-  card.state = 'flipped';
-  emit('flip', props);
+const openCard = () => {
+  emit('open', props);
 };
 
 const handleYes = () => {
-  emit('action', {...props, remembered: true});
-  card.state = 'completed';
-  card.remembered = true;
+  emit('action', props);
 };
 
 const handleNo = () => {
-  emit('action', {...props, remembered: false});
-  card.state = 'completed';
-  card.remembered = false;
+  emit('action', props);
 };
 </script>
 
@@ -49,70 +46,60 @@ const handleNo = () => {
     <div
         class="card"
         :class="{
-        'card--flipped': card.state  === 'flipped' || card.state  === 'completed',
-        'card--clickable': card.state  === 'initial'
-      }"
-        @click="card.state === 'initial' && flipCard()"
+  'card--opened': props.state === 'opened',
+  'card--clickable': props.state === 'closed' && props.status === 'pending'
+}"
+        @click="props.state === 'closed' && props.status === 'pending' && openCard()"
     >
-      <!-- Передняя сторона -->
+      <!-- Передняя сторона - всегда в DOM -->
       <div class="card-face card-face--front">
         <span class="card-number">{{ props.cardNum }}</span>
         <div class="card-border">
-          <div class="card-content">
-            {{ props.cardWord }}
-          </div>
+          <div class="card-content">{{ props.cardWord }}</div>
         </div>
-
         <div class="card-actions">
-          <span class="card-actions-label">перевернуть</span>
+          <span v-if="props.status === 'pending'" class="card-actions-label">перевернуть</span>
+          <span v-else class="card-actions-label">завершено</span>
+        </div>
+        <!-- Иконка результата для завершенных когда карта закрыта -->
+        <div v-if="props.state === 'closed' && props.status !== 'pending'" class="check-status-icon">
+          <CheckIcon v-if="props.status === 'success'"/>
+          <CrossIcon v-else-if="props.status === 'fail'"/>
         </div>
       </div>
 
-      <!-- Задняя сторона -->
+      <!-- Задняя сторона - всегда в DOM -->
       <div class="card-face card-face--back">
         <span class="card-number">{{ props.cardNum }}</span>
         <div class="card-border">
-          <div class="card-content">
-            {{ props.cardTranslation }}
-          </div>
+          <div class="card-content">{{ props.cardTranslation }}</div>
         </div>
 
         <div class="card-actions">
-          <!-- Кнопки "ДА" и "НЕТ" -->
-          <template v-if="card.state === 'flipped'">
-            <button
-                class="card-action-button"
-                @click.stop="handleNo"
-                aria-label="Нет, не запомнил"
-            >
+          <!-- СОСТОЯНИЕ 2: opened + pending - показываем кнопки -->
+          <template v-if="props.state === 'opened' && props.status === 'pending'">
+            <button class="card-action-button" @click.stop="handleNo">
               <CrossIcon/>
             </button>
-            <button
-                class="card-action-button"
-                @click.stop="handleYes"
-                aria-label="Да, запомнил"
-            >
+            <button class="card-action-button" @click.stop="handleYes">
               <CheckIcon/>
             </button>
           </template>
 
-          <!-- Надпись "ЗАВЕРШЕНО" -->
-          <span
-              v-else-if="card.state === 'completed'"
-              class="card-actions-label"
-          >
-            завершено
-          </span>
+          <!-- СОСТОЯНИЯ 3,4: opened + (success|fail) - показываем результат -->
+          <span v-else-if="props.state === 'opened'" class="card-actions-label">завершено</span>
         </div>
 
-        <div v-if="card.state === 'completed'" class="check-status-icon">
-          <CheckIcon v-if="card.remembered===true"/>
-          <CrossIcon v-else-if="card.remembered===false"/>
+        <!-- Иконка результата для задней стороны -->
+        <div v-if="props.state === 'opened' && props.status !== 'pending'" class="check-status-icon">
+          <CheckIcon v-if="props.status === 'success'"/>
+          <CrossIcon v-else-if="props.status === 'fail'"/>
         </div>
-
       </div>
+
     </div>
   </div>
+
 </template>
 
 <style scoped>
@@ -133,7 +120,7 @@ const handleNo = () => {
 }
 
 /* Состояние переворота */
-.card--flipped {
+.card--opened {
   transform: rotateY(180deg);
 }
 
@@ -159,7 +146,7 @@ const handleNo = () => {
 }
 
 .card-face--front:hover,
-.card--flipped .card-face--back:hover {
+.card--opened .card-face--back:hover {
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.15);
 }
 
