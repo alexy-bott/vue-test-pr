@@ -1,11 +1,18 @@
 <script setup>
 import Score from "./Score.vue";
+
+defineProps({
+  score: {
+    type: Number,
+    default: 0
+  }
+});
 </script>
 
 <template>
   <header class="header" aria-label="Количество очков">
     <h1 class="header-title">запомни слово</h1>
-    <Score/>
+    <Score :stat="score"/>
   </header>
 </template>
 

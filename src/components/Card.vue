@@ -11,6 +11,10 @@ const props = defineProps({
   cardWord: {
     type: String,
     default: "",
+  },
+  cardTranslation: {
+    type: String,
+    default: "",
   }
 });
 
@@ -69,7 +73,7 @@ const handleNo = () => {
         <span class="card-number">{{ props.cardNum }}</span>
         <div class="card-border">
           <div class="card-content">
-            {{ props.cardWord }}
+            {{ props.cardTranslation }}
           </div>
         </div>
 
